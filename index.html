@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employee Task Management System</title>
+  <style>
+    :root {
+      --primary-color: #4a90e2;
+      --secondary-color: #50e3c2;
+      --bg-color: #ffffff;
+      --text-color: #6b7280;
+      --card-bg: #f9fafb;
+      --border-radius: 12px;
+      --box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    main {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-weight: 700;
+      font-size: 3.5rem;
+      color: var(--primary-color);
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    form {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem 2rem;
+      margin-bottom: 3rem;
+    }
+    form label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--primary-color);
+    }
+    form input, form select, form textarea {
+      margin-top: 0.5rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
+      font-size: 1rem;
+      font-family: var(--font-family);
+      color: #374151;
+      background-color: white;
+      transition: border-color 0.3s ease;
+    }
+    form input:focus, form select:focus, form textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
+    }
+    form textarea {
+      resize: vertical;
+      min-height: 80px;
+      grid-column: span 2;
+    }
+    input[type="submit"] {
+      grid-column: span 2;
+      justify-self: center;
+      background: var(--primary-color);
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+      max-width: 280px;
+    }
+    input[type="submit"]:hover,
+    input[type="submit"]:focus {
+      background: var(--secondary-color);
+      outline: none;
+    }
+    .filter-bar {
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem 2rem;
+      align-items: center;
+      justify-content: space-between;
+      color: #374151;
+    }
+    .filter-bar label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      font-size: 1rem;
+      max-width: 220px;
+      color: var(--primary-color);
+    }
+    .filter-bar select,
+    .filter-bar input[type="text"] {
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1.5px solid #d1d5db;
+      font-size: 1rem;
+      font-family: var(--font-family);
+      color: #374151;
+      background-color: white;
+      transition: border-color 0.3s ease;
+      width: 100%;
+    }
+    .filter-bar select:focus,
+    .filter-bar input[type="text"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
+      outline: none;
+    }
+    #clear-filters {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      height: fit-content;
+      align-self: flex-end;
+    }
+    #clear-filters:hover,
+    #clear-filters:focus {
+      background: var(--secondary-color);
+      outline: none;
+    }
+    section.tasks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+      gap: 1.5rem;
+    }
+    .task-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: box-shadow 0.3s ease;
+      min-height: 180px;
+    }
+    .task-card:hover,
+    .task-card:focus-within {
+      box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3);
+      outline: none;
+    }
+    .task-title {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--primary-color);
+      margin: 0;
+      line-height: 1.2;
+    }
+    .task-desc {
+      font-size: 1rem;
+      color: #4b5563;
+      line-height: 1.4;
+      flex-grow: 1;
+    }
+    .task-meta {
+      font-size: 0.9rem;
+      color: #6b7280;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    .task-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #e5e7eb;
+      padding: 0.3rem 0.65rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      user-select: none;
+    }
+    .badge-priority.Low {
+      background-color: #50e3c2;
+      color: #065f46;
+    }
+    .badge-priority.Medium {
+      background-color: #fbbf24;
+      color: #713f12;
+    }
+    .badge-priority.High {
+      background-color: #ef4444;
+      color: white;
+    }
+    .badge-status.completed {
+      background-color: #34d399;
+      color: #064e3b;
+    }
+    .badge-status.pending {
+      background-color: #eab308;
+      color: #78350f;
+    }
+    .task-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    button.complete-btn {
+      background-color: var(--secondary-color);
+      color: #ffffff;
+      font-weight: 700;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button.complete-btn:hover,
+    button.complete-btn:focus {
+      background-color: #3ac7b1;
+      outline: none;
+    }
+    button.delete-btn {
+      background-color: #ef4444;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button.delete-btn:hover,
+    button.delete-btn:focus {
+      background-color: #dc2626;
+      outline: none;
+    }
+    @media (max-width: 640px) {
+      form textarea {
+        grid-column: span 1;
+      }
+      form {
+        grid-template-columns: 1fr;
+      }
+      input[type="submit"] {
+        grid-column: span 1;
+        width: 100%;
+      }
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #clear-filters {
+        align-self: stretch;
+      }
+      section.tasks {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Employee Task Management System</h1>
+    </header>
+    <form id="task-form" autocomplete="off">
+      <label for="task-title-input">Task Title <sup style="color:#ef4444;">*</sup>
+        <input type="text" id="task-title-input" maxlength="100" required placeholder="Enter task title" />
+      </label>
+      <label for="employee-input">Assign To <sup style="color:#ef4444;">*</sup>
+        <input type="text" id="employee-input" maxlength="50" required placeholder="Employee name" />
+      </label>
+      <label for="dept-input">Department
+        <select id="dept-input" >
+          <option value="CE">Civil Department</option>
+          <option value="CO">Computer Department</option>
+          <option value="EJ">Electronic Department</option>
+          <option value="IF">Information Technology</option>
+          <option value="ME">Mechanical Department</option>
+          <option value="GS">General Science</option>
+        </select>
+      </label>
+      <label for="actual-date-input">Actual Date
+        <input type="date" id="actual-date-input" />
+      </label>
+      <label for="updated-date-input">Updated Date
+        <input type="date" id="updated-date-input" />
+      </label>
+      <label for="priority-input">Priority
+        <select id="priority-input" >
+          <option value="Low">Low</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="High">High</option>
+        </select>
+      </label>
+      <label for="description-input">Task Description
+        <textarea id="description-input" maxlength="300" placeholder="Add more details about the task (optional)"></textarea>
+      </label>
+      <input type="submit" value="Add Task" />
+    </form>
+
+    <div class="filter-bar" role="region" aria-label="Filters">
+      <label for="filter-dept">Filter by Department:
+        <select id="filter-dept">
+          <option value="all" selected>All Departments</option>
+          <option value="CE">Civil Department</option>
+          <option value="CO">Computer Department</option>
+          <option value="EJ">Electronic Department</option>
+          <option value="IF">Information Technology</option>
+          <option value="ME">Mechanical Department</option>
+          <option value="GS">General Science</option>
+        </select>
+      </label>
+      <label for="filter-employee">Filter by Employee:
+        <input type="text" id="filter-employee" placeholder="Employee name" />
+      </label>
+      <button id="clear-filters" title="Clear filters">Clear Filters</button>
+    </div>
+
+    <section class="tasks" id="tasks-container" aria-live="polite" aria-label="Task list">
+      <!-- Task cards injected here -->
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.getElementById('task-form');
+      const tasksContainer = document.getElementById('tasks-container');
+      const filterDept = document.getElementById('filter-dept');
+      const filterEmployee = document.getElementById('filter-employee');
+      const clearFiltersBtn = document.getElementById('clear-filters');
+
+      // Task data structure:
+      // {id, title, assignedTo, department, actualDate, updatedDate, priority, description, completed, createdAt}
+
+      let tasks = JSON.parse(localStorage.getItem('employeeTasks')) || [];
+
+      function saveTasks() {
+        localStorage.setItem('employeeTasks', JSON.stringify(tasks));
+      }
+
+      function createTaskCard(task) {
+        const card = document.createElement('article');
+        card.className = 'task-card';
+        card.tabIndex = 0;
+        card.setAttribute('aria-label', `Task titled '${task.title}', assigned to ${task.assignedTo}`);
+
+        const titleEl = document.createElement('h2');
+        titleEl.className = 'task-title';
+        titleEl.textContent = task.title;
+
+        const descEl = document.createElement('p');
+        descEl.className = 'task-desc';
+        descEl.textContent = task.description || '';
+
+        const metaEl = document.createElement('div');
+        metaEl.className = 'task-meta';
+
+        const assignedSpan = document.createElement('span');
+        assignedSpan.textContent = '👤 ' + task.assignedTo;
+        metaEl.appendChild(assignedSpan);
+
+        if (task.department) {
+          const deptSpan = document.createElement('span');
+          deptSpan.textContent = '🏢 ' + {
+            CE: 'Civil',
+            CO: 'Computer',
+            EJ: 'Electronic',
+            IF: 'IT',
+            ME: 'Mechanical',
+            GS: 'General Science'
+          }[task.department] || task.department;
+          metaEl.appendChild(deptSpan);
+        }
+        if (task.actualDate) {
+          const actualDateSpan = document.createElement('span');
+          actualDateSpan.textContent = '📅 Actual: ' + new Date(task.actualDate).toLocaleDateString();
+          metaEl.appendChild(actualDateSpan);
+        }
+        if (task.updatedDate) {
+          const updatedDateSpan = document.createElement('span');
+          updatedDateSpan.textContent = '📅 Updated: ' + new Date(task.updatedDate).toLocaleDateString();
+          metaEl.appendChild(updatedDateSpan);
+        }
+
+        const prioritySpan = document.createElement('span');
+        prioritySpan.textContent = '⚡ ' + task.priority;
+        prioritySpan.className = 'badge-priority ' + task.priority;
+        metaEl.appendChild(prioritySpan);
+
+        const statusSpan = document.createElement('span');
+        statusSpan.textContent = task.completed ? 'Completed' : 'Pending';
+        statusSpan.className = 'badge-status ' + (task.completed ? 'completed' : 'pending');
+        metaEl.appendChild(statusSpan);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'task-actions';
+
+        if (!task.completed) {
+          const completeBtn = document.createElement('button');
+          completeBtn.type = 'button';
+          completeBtn.className = 'complete-btn';
+          completeBtn.setAttribute('aria-label', `Mark task "${task.title}" as completed`);
+          completeBtn.textContent = 'Complete';
+          completeBtn.addEventListener('click', () => {
+            markTaskCompleted(task.id);
+          });
+          actionsDiv.appendChild(completeBtn);
+        }
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.setAttribute('aria-label', `Delete task "${task.title}"`);
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', () => {
+          deleteTask(task.id);
+        });
+        actionsDiv.appendChild(deleteBtn);
+
+        card.appendChild(titleEl);
+        card.appendChild(descEl);
+        card.appendChild(metaEl);
+        card.appendChild(actionsDiv);
+
+        return card;
+      }
+
+      function renderTasks() {
+        tasksContainer.innerHTML = '';
+
+        const deptFilter = filterDept.value;
+        const employeeFilter = filterEmployee.value.trim().toLowerCase();
+
+        let filteredTasks = tasks;
+
+        if (deptFilter !== 'all') {
+          filteredTasks = filteredTasks.filter(t => t.department === deptFilter);
+        }
+        if (employeeFilter.length > 0) {
+          filteredTasks = filteredTasks.filter(t => t.assignedTo.toLowerCase().includes(employeeFilter));
+        }
+
+        if (filteredTasks.length === 0) {
+          const noTasksMsg = document.createElement('p');
+          noTasksMsg.textContent = 'No tasks to display.';
+          noTasksMsg.style.textAlign = 'center';
+          noTasksMsg.style.color = '#9ca3af';
+          tasksContainer.appendChild(noTasksMsg);
+          return;
+        }
+
+        // Sort newest first
+        filteredTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        filteredTasks.forEach(task => {
+          const card = createTaskCard(task);
+          tasksContainer.appendChild(card);
+        });
+      }
+
+      function addTask(task) {
+        tasks.push(task);
+        saveTasks();
+        renderTasks();
+      }
+
+      function deleteTask(taskId) {
+        if (confirm('Are you sure you want to delete this task?')) {
+          tasks = tasks.filter(t => t.id !== taskId);
+          saveTasks();
+          renderTasks();
+        }
+      }
+
+      function markTaskCompleted(taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+          task.completed = true;
+          saveTasks();
+          renderTasks();
+        }
+      }
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        const title = document.getElementById('task-title-input').value.trim();
+        const assignedTo = document.getElementById('employee-input').value.trim();
+        const department = document.getElementById('dept-input').value;
+        const actualDate = document.getElementById('actual-date-input').value;
+        const updatedDate = document.getElementById('updated-date-input').value;
+        const priority = document.getElementById('priority-input').value;
+        const description = document.getElementById('description-input').value.trim();
+
+        if (!title || !assignedTo) {
+          alert('Please fill out the required fields: Task Title and Assign To');
+          return;
+        }
+
+        const newTask = {
+          id: Date.now().toString(),
+          title,
+          assignedTo,
+          department,
+          actualDate: actualDate || null,
+          updatedDate: updatedDate || null,
+          priority,
+          description,
+          completed: false,
+          createdAt: new Date().toISOString()
+        };
+
+        addTask(newTask);
+        form.reset();
+        document.getElementById('task-title-input').focus();
+      });
+
+      filterDept.addEventListener('change', renderTasks);
+      filterEmployee.addEventListener('input', renderTasks);
+      clearFiltersBtn.addEventListener('click', () => {
+        filterDept.value = 'all';
+        filterEmployee.value = '';
+        renderTasks();
+      });
+
+      // Initial render
+      renderTasks();
+    })();
+  </script>
+</body>
+</html>
+
